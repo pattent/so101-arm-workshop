@@ -4,7 +4,7 @@
 
     arm = Arm()
     arm.go_to('rest')                 # a saved pose: 'rest', 'zero', 'extended', 'look'
-    arm.move_joints(0, -45, 90, 45, 0)  # five joint angles, in degrees
+    arm.move_joints(0, -45, 45, 45, 0)  # five joint angles, in degrees
     arm.move_to(0.25, 0.0, 0.10)      # gripper position in meters (x, y, z)
     arm.open_gripper()
     arm.close_gripper()
@@ -72,6 +72,10 @@ BLOCK_SIZE = 0.025
 BIN_SIZE = 0.10
 BIN_HEIGHT = 0.01
 GRAB_TOLERANCE = 0.02   # how close (m) the gripper must be to a block to catch it
+
+# The shoulder joint's position, and how far the gripper can get from it (meters).
+SHOULDER = (0.0388, 0.0, 0.0624)
+MAX_REACH = 0.44
 COLORS = {
     'red': (0.9, 0.1, 0.1),
     'green': (0.1, 0.8, 0.2),
@@ -171,6 +175,11 @@ class Arm:
         x is forward, y is to the robot's left, z is up.
         """
         self._log(f'Moving gripper to x={x:.3f} y={y:.3f} z={z:.3f}')
+        distance = math.dist((x, y, z), SHOULDER)
+        if distance > MAX_REACH:
+            self._log(f'Too far! That point is {distance:.2f} m from the shoulder, '
+                      f'but the arm only reaches about {MAX_REACH} m.')
+            return False
         target = Pose()
         target.position.x, target.position.y, target.position.z = float(x), float(y), float(z)
         target.orientation.w = 1.0
@@ -330,7 +339,7 @@ class Arm:
             return False
         if result.error_code.val != MoveItErrorCodes.SUCCESS:
             self._log(f'MoveIt could not do that (error code {result.error_code.val}). '
-                      'The target may be out of reach.')
+                      'The target may be out of reach, or the arm would hit something.')
             return False
         return True
 

@@ -97,6 +97,12 @@ Launch options:
 | `rviz:=false` | Don't open RViz (lighter on slow laptops; you lose drag-to-plan) |
 | `view:=false` | Don't open the simulation window |
 
+## Lessons
+
+Once everything is set up, head to **[`lessons/`](lessons/)**: one folder per lesson, from
+Python basics to a robot that sorts blocks it finds with a camera. Start with
+[Lesson 0](lessons/00_kickoff/).
+
 ## Writing your own code
 
 ```python
@@ -104,7 +110,7 @@ from workshop_arm import Arm
 
 arm = Arm()
 arm.go_to('rest')                     # saved poses: 'rest', 'zero', 'extended', 'look'
-arm.move_joints(0, -45, 90, 45, 0)    # 5 joint angles, in degrees
+arm.move_joints(0, -45, 45, 45, 0)    # 5 joint angles, in degrees
 arm.move_to(0.25, 0.0, 0.10)          # gripper position in meters (x forward, y left, z up)
 arm.open_gripper()
 arm.close_gripper()
@@ -151,7 +157,7 @@ is running.
 | `pixi.toml` | Everything we install (ROS 2, MoveIt, MuJoCo, OpenCV...) |
 | `colcon_defaults.yaml` | Default `colcon build` options (used automatically inside `pixi shell`) |
 | `scripts/setup_workspace.py` | Downloads the SO-101 packages and adapts them for the workshop |
-| `CURRICULUM.md` | The lesson plan |
+| `lessons/` | **Start here after setup:** one folder per lesson, with exercises and solutions |
 | `src/workshop_arm/workshop_arm/arm.py` | The beginner-friendly `Arm` helper |
 | `src/workshop_arm/workshop_arm/table.py` | Table layout: bins, known blocks (stage 2), random block area (stage 3), camera |
 | `src/workshop_arm/workshop_arm/vision.py` | Block detection with OpenCV (no ROS) |
