@@ -21,6 +21,16 @@ stack from webcam pixels to motor commands.
 | 🥈 Silver | Sort 3 blocks from known positions into bins, avoiding obstacles | Module 10 |
 | 🥇 Gold | The camera finds the blocks (simulated first), arm sorts them automatically | Module 12 |
 
+## Simulation stages
+
+The simulation grows with her (`ros2 launch workshop_arm workshop.launch.py stage:=N`):
+
+| Stage | What's in the simulation | Used in |
+|---|---|---|
+| 1 | Arm, MoveIt, RViz, empty table | Modules 0–9 |
+| 2 | + bins and blocks at known spots | Module 10 (Silver) |
+| 3 | + random blocks, live overhead camera, block detector | Modules 11–12 (Gold) |
+
 ## Working backwards: the skills Gold needs
 
 ```
@@ -36,7 +46,7 @@ Gold: webcam → block positions → arm sorts them
 
 ## Module 0: Kickoff, "Here's where we're going"
 
-- Watch the demo: `ros2 launch so101_bringup follower_moveit_demo.launch.py hardware_type:=mock`, then `ros2 run workshop_arm demo` (the arm does a pick and place).
+- Watch where we're going: `workshop.launch.py stage:=3` + `ros2 run workshop_arm vision_demo` (the arm finds and sorts blocks by itself).
 - Play: drag the arm around in RViz with the interactive marker.
 - Show a video of a real SO-101 sorting blocks, so she sees what's possible.
 - Install pixi and the workshop on her laptop (see README). **Goal: she leaves with it running.**
@@ -103,6 +113,7 @@ URDF, links and joints, TF frames, RViz.
 - Challenge: add obstacles from Python and reach a target "behind" one.
 
 ### Module 10: Pick and place → 🥈 Silver
+Simulation: `stage:=2` (bins and blocks at the known spots in `table.py`).
 - Together: show blocks and bins in RViz (markers/collision objects); "attach" a block to the gripper when grasped.
 - Together: break pick/place into functions: `pick(x, y)`, `place(x, y)`.
 - **Silver challenge:** sort 3 blocks at known positions into 2 bins by color.
@@ -110,8 +121,8 @@ URDF, links and joints, TF frames, RViz.
 ## Part 5: Seeing the world
 
 ### Module 11: Computer vision with OpenCV
-Starts with the simulated overhead camera (`ros2 launch workshop_arm perception_sim.launch.py`).
-- Together: look at `/camera/image_raw` in `rqt_image_view`. What does the robot "see"?
+Simulation: `stage:=3` (random blocks + a live overhead camera).
+- Together: look at `/camera/image_raw` in `rqt_image_view`. What does the robot "see"? Move the arm: it blocks the view!
 - Together: build a color mask (HSV thresholding) for one color and display it; tune the ranges.
 - Together: find contours, filter by size (why do the bins not count as blocks?), mark the centers.
 - Challenge: add yellow blocks: a new color range in `vision.py` (and a yellow bin in `table.py`).
@@ -121,6 +132,7 @@ Starts with the simulated overhead camera (`ros2 launch workshop_arm perception_
 - Together: the pinhole camera model: why does `pixel_to_table()` need the camera's height and focal length?
 - Together: check accuracy: compare detected positions with where the blocks really are.
 - Together: read `block_detector.py`: turning a function into a ROS node that publishes `/detected_blocks`.
+- Together: run with `detector:=false` and plug in her own detector node.
 - **Gold challenge:** write her own version of `vision_demo`: look → pick → place → look again
   until the table is clean. Stretch: sort the closest block first; recover from a missed grab.
 - (Real webcam later: calibrate with 4 marked corners on paper → homography, replacing the pinhole math.)

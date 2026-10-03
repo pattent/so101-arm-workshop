@@ -4,8 +4,9 @@ The robot does NOT know where the blocks are. It looks with the camera
 (/detected_blocks from block_detector), picks one up, puts it in the bin of the
 same color, and looks again, until there are no blocks left.
 
-Run (with the robot, sim_camera and block_detector running):
-    ros2 run workshop_arm spawn_blocks
+Start the stage 3 simulation first (random blocks + camera + block detector):
+    ros2 launch workshop_arm workshop.launch.py stage:=3
+Then:
     ros2 run workshop_arm vision_demo
 """
 
@@ -56,7 +57,7 @@ def main():
 
     while misses < MAX_MISSES:
         # Get out of the camera's way, then look.
-        arm.go_to('rest')
+        arm.go_to('look')
         blocks = [b for b in eyes.look() if not in_a_bin(b[1], b[2])]
         print(f'I see {len(blocks)} block(s) to sort: '
               + ', '.join(f'{c} at ({x:.3f}, {y:.3f})' for c, x, y in blocks))

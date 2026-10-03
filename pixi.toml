@@ -30,6 +30,7 @@ git = "*"
 numpy = "*"
 opencv = "*"
 matplotlib = "*"
+mujoco = "*"          # renders the simulated camera view
 
 # Default colcon options, so students can type a plain `colcon build`.
 [target.unix.activation.env]

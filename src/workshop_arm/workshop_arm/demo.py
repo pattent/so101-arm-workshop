@@ -1,27 +1,32 @@
-"""Preview of the final project: sort colored blocks into matching bins.
+"""Stage 2 example: sort blocks whose positions we already know.
 
-Run it (with the robot launch file already running in another terminal):
+Start the stage 2 simulation first (it puts the bins and blocks on the table):
+    ros2 launch workshop_arm workshop.launch.py stage:=2
+Then:
     ros2 run workshop_arm demo
 """
 
 from workshop_arm import Arm
 from workshop_arm.table import BINS
 
-# Where the blocks are on the table (x forward, y left), in meters.
-# (Here we just type them in. vision_demo finds them with the camera instead.)
-BLOCKS = {
-    'red_block': (0.22, -0.10, 'red'),
-    'blue_block': (0.28, 0.02, 'blue'),
-}
+# Where the blocks are (x forward, y left, in meters) and what color they are.
+# Here we just type them in, copied from KNOWN_BLOCKS in table.py.
+# In stage 3, vision_demo finds them with the camera instead.
+BLOCKS = [
+    (0.22, -0.10, 'red'),
+    (0.28, 0.02, 'blue'),
+    (0.30, -0.12, 'green'),
+]
 GRAB_Z = 0.015   # gripper height for grabbing a block
 SAFE_Z = 0.12    # height for moving around without hitting anything
 
 
-def pick(arm, name, x, y):
+def pick(arm, x, y):
     arm.move_to(x, y, SAFE_Z)      # above the block
     arm.move_to(x, y, GRAB_Z)      # down
-    arm.grab(name)
+    caught = arm.grab()
     arm.move_to(x, y, SAFE_Z)      # back up
+    return caught
 
 
 def place(arm, x, y):
@@ -31,20 +36,14 @@ def place(arm, x, y):
 
 def main():
     arm = Arm()
-
-    # Set up the table.
-    arm.clear_table()
-    for color, (x, y) in BINS.items():
-        arm.add_bin(f'{color}_bin', x, y, color=color)
-    for name, (x, y, color) in BLOCKS.items():
-        arm.add_block(name, x, y, color=color)
-
     arm.go_to('rest')
     arm.open_gripper()
 
     # Sort each block into the bin of the same color.
-    for name, (x, y, color) in BLOCKS.items():
-        pick(arm, name, x, y)
+    for x, y, color in BLOCKS:
+        if not pick(arm, x, y):
+            print('No block there. Did you start the simulation with stage:=2?')
+            continue
         bin_x, bin_y = BINS[color]
         place(arm, bin_x, bin_y)
 

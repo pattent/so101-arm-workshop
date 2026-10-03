@@ -3,15 +3,21 @@
 All positions are in meters, measured from the robot's base (x forward, y left, z up).
 """
 
-# Bins are bolted down, so their positions are known. Blocks are NOT: the robot
-# has to find them with the camera.
+# Bins are bolted down, so their positions are always known.
 BINS = {
     'red': (0.12, 0.22),
     'green': (0.24, 0.20),
     'blue': (0.34, 0.12),
 }
 
-# Blocks get scattered somewhere inside this rectangle.
+# Stage 2: blocks always start at these known spots (name: (x, y, color)).
+KNOWN_BLOCKS = {
+    'block_0': (0.22, -0.10, 'red'),
+    'block_1': (0.28, 0.02, 'blue'),
+    'block_2': (0.30, -0.12, 'green'),
+}
+
+# Stage 3: blocks get scattered at random somewhere inside this rectangle.
 BLOCK_AREA_X = (0.18, 0.32)
 BLOCK_AREA_Y = (-0.16, 0.04)
 

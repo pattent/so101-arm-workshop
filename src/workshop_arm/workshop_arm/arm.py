@@ -3,7 +3,7 @@
     from workshop_arm import Arm
 
     arm = Arm()
-    arm.go_to('rest')                 # a saved pose: 'rest', 'zero', 'extended'
+    arm.go_to('rest')                 # a saved pose: 'rest', 'zero', 'extended', 'look'
     arm.move_joints(0, -45, 90, 45, 0)  # five joint angles, in degrees
     arm.move_to(0.25, 0.0, 0.10)      # gripper position in meters (x, y, z)
     arm.open_gripper()
@@ -58,6 +58,7 @@ SAVED_POSES = {
     'zero': [0, 0, 0, 0, 0],
     'rest': [0, -90, 90, 43, 0],
     'extended': [0, 90, -90, 0, 0],
+    'look': [-100, -90, 90, 43, 0],   # folded off to the side, out of the camera's view
 }
 
 # Gripper joint range, in radians.
@@ -135,9 +136,9 @@ class Arm:
         self._tf_listener = TransformListener(self._tf_buffer, self.node)
 
         self._log('Waiting for MoveIt and the gripper controller...')
-        if not self._move_client.wait_for_server(timeout_sec=30.0):
+        if not self._move_client.wait_for_server(timeout_sec=60.0):
             raise RuntimeError('MoveIt is not running. Did you start the launch file?')
-        if not self._gripper_client.wait_for_server(timeout_sec=30.0):
+        if not self._gripper_client.wait_for_server(timeout_sec=60.0):
             raise RuntimeError('The gripper controller is not running.')
         self._log('Arm ready!')
 

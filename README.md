@@ -52,45 +52,42 @@ source install/setup.bash      # our workspace   (Windows: call install\setup.ba
 
 Re-run the `source` line after every `colcon build`.
 
-## 5. See the robot move
+## 5. Start the simulation for your stage
 
-Terminal 1: start the simulated arm, controllers, MoveIt and RViz:
+The simulation grows with you. Pick the stage you're at:
+
+| Stage | Command | What you get | Lessons |
+|---|---|---|---|
+| 1 | `ros2 launch workshop_arm workshop.launch.py stage:=1` | The arm, MoveIt and RViz on an empty table | Modules 0–9 |
+| 2 | `ros2 launch workshop_arm workshop.launch.py stage:=2` | + bins, and blocks at **known** spots (`KNOWN_BLOCKS` in `table.py`) | Module 10 (Silver) |
+| 3 | `ros2 launch workshop_arm workshop.launch.py stage:=3` | + blocks at **random** spots, a live overhead camera, and a block detector | Modules 11–12 (Gold) |
+
+Stage 3 options: `blocks:=8` (how many), `seed:=42` (same layout every time),
+`detector:=false` (run your own detector instead of ours). Add `camera:=true` to stage 1 or 2
+to watch the camera there too.
+
+Then, in a second terminal:
+
 ```bash
-ros2 launch so101_bringup follower_moveit_demo.launch.py hardware_type:=mock
+ros2 run workshop_arm demo          # stage 2: sorts the blocks using their known positions
+ros2 run workshop_arm vision_demo   # stage 3: finds the blocks with the camera, then sorts them
 ```
 
-Terminal 2: sort a red and a blue block into matching bins:
-```bash
-ros2 run workshop_arm demo
-```
+Try dragging the arm's marker in RViz and clicking **Plan & Execute**, too.
 
-Then try dragging the arm's marker in RViz and clicking **Plan & Execute**.
+## 6. How the camera works (stage 3)
 
-## 6. Let the robot find the blocks itself (perception)
-
-In `demo`, we typed in where the blocks are. Here a (simulated) overhead camera
-looks at the table, OpenCV finds the blocks, and the arm sorts whatever it sees.
-
-Terminal 1: arm + MoveIt + RViz + camera + block detector + a camera viewer window:
-```bash
-ros2 launch workshop_arm perception_sim.launch.py
-```
-
-Terminal 2: scatter blocks at random spots, then sort them using only the camera:
-```bash
-ros2 run workshop_arm spawn_blocks        # 5 random blocks (try: spawn_blocks 8)
-ros2 run workshop_arm vision_demo
-```
-
-How it fits together:
 ```
 sim_camera  --/camera/image_raw-->  block_detector  --/detected_blocks-->  vision_demo  -->  MoveIt  -->  arm
-(draws the table                    (OpenCV: color mask,                    (look, pick,
+(live 3D view                       (OpenCV: color mask,                    (look, pick,
  from above)                         contours, pixel -> meters)              place, repeat)
 ```
 
-The camera viewer shows `/vision/debug_image`: what the detector found, with each
-block's position on the table. The detector code is in `workshop_arm/vision.py`.
+`sim_camera` draws a live 3D view (about 15 frames per second) with [MuJoCo](https://mujoco.org):
+it copies the arm's joint angles onto a model of the real SO-101 and shows the blocks and bins
+where MoveIt says they are. The arm, its shadow and anything it holds are all in the picture,
+just like a real camera. The camera window shows `/vision/debug_image`: what the detector found,
+with each block's position on the table. The detector code is in `workshop_arm/vision.py`.
 It's plain OpenCV, so the same functions work on a real webcam picture.
 
 ## Writing your own code
@@ -99,7 +96,7 @@ It's plain OpenCV, so the same functions work on a real webcam picture.
 from workshop_arm import Arm
 
 arm = Arm()
-arm.go_to('rest')                     # saved poses: 'rest', 'zero', 'extended'
+arm.go_to('rest')                     # saved poses: 'rest', 'zero', 'extended', 'look'
 arm.move_joints(0, -45, 90, 45, 0)    # 5 joint angles, in degrees
 arm.move_to(0.25, 0.0, 0.10)          # gripper position in meters (x forward, y left, z up)
 arm.open_gripper()
@@ -124,7 +121,9 @@ as in step 3) while the launch file is running.
 | `colcon_defaults.yaml` | Default `colcon build` options (used automatically inside `pixi shell`) |
 | `scripts/setup_workspace.py` | Downloads the SO-101 packages and adapts them for the workshop |
 | `src/workshop_arm/workshop_arm/arm.py` | The beginner-friendly `Arm` helper |
-| `src/workshop_arm/workshop_arm/table.py` | Workcell layout: bin positions, block area, camera position |
+| `src/workshop_arm/workshop_arm/table.py` | Workcell layout: bins, known blocks (stage 2), random block area (stage 3), camera |
+| `src/workshop_arm/launch/workshop.launch.py` | Starts the simulation for a given stage |
+| `src/workshop_arm/models/` | SO-101 MuJoCo model (from MuJoCo Menagerie), used to draw the camera view |
 | `src/workshop_arm/workshop_arm/vision.py` | Block detection with OpenCV (no ROS) |
 | `src/workshop_arm/workshop_arm/*.py` | Nodes: `sim_camera`, `block_detector`, `spawn_blocks`, `demo`, `vision_demo` |
 | `src/so101-ros-physical-ai/` | SO-101 robot model, controllers and MoveIt config ([upstream](https://github.com/esol-community/so101-ros-physical-ai)) |
@@ -138,9 +137,10 @@ as in step 3) while the launch file is running.
 - `moveit_py` is not available on Windows, so `workshop_arm` talks to MoveIt using plain ROS 2 actions.
 - The robot packages are patched to `LANGUAGES NONE` and built with Ninja, so no C++ compiler
   (or Visual Studio) is needed.
-- Simulated perception: `sim_camera` renders MoveIt's planning scene from above (pinhole model, with
-  noise and blur) instead of using Gazebo, so it works on every OS. It does not draw the arm itself,
-  so a held block simply disappears from view. On real hardware this node is swapped for a webcam driver.
+- Simulated perception: MuJoCo is used only as a renderer (no physics). MoveIt + ros2_control mock
+  hardware still move the arm; `sim_camera` mirrors `/follower/joint_states` and MoveIt's planning
+  scene into MuJoCo each frame. MuJoCo installs from conda-forge on Linux, macOS and Windows, unlike
+  Gazebo. On real hardware this node is swapped for a webcam driver.
 - Blocks are allowed to collide with everything in MoveIt (the gripper must touch them); `grab()`
   only succeeds if a block is within 2 cm of the gripper, so bad perception shows up as a miss.
 - If your own `~/.bashrc` sources another ROS install (e.g. Humble), start from a clean shell first:
