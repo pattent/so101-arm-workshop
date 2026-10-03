@@ -83,9 +83,10 @@ sim_camera  --/camera/image_raw-->  block_detector  --/detected_blocks-->  visio
  from above)                         contours, pixel -> meters)              place, repeat)
 ```
 
-`sim_camera` draws a live 3D view (about 15 frames per second) with [MuJoCo](https://mujoco.org):
-it copies the arm's joint angles onto a model of the real SO-101 and shows the blocks and bins
-where MoveIt says they are. The arm, its shadow and anything it holds are all in the picture,
+`sim_camera` draws a live 3D view (about 15 frames per second) with [MuJoCo](https://mujoco.org).
+It loads the same robot description that MoveIt and RViz use, so the arm in the camera is the
+same arm as in RViz. It copies the arm's joint angles onto it every frame and shows the blocks
+and bins where MoveIt says they are. The arm, its shadow and anything it holds are all in the picture,
 just like a real camera. The camera window shows `/vision/debug_image`: what the detector found,
 with each block's position on the table. The detector code is in `workshop_arm/vision.py`.
 It's plain OpenCV, so the same functions work on a real webcam picture.
@@ -123,7 +124,6 @@ as in step 3) while the launch file is running.
 | `src/workshop_arm/workshop_arm/arm.py` | The beginner-friendly `Arm` helper |
 | `src/workshop_arm/workshop_arm/table.py` | Workcell layout: bins, known blocks (stage 2), random block area (stage 3), camera |
 | `src/workshop_arm/launch/workshop.launch.py` | Starts the simulation for a given stage |
-| `src/workshop_arm/models/` | SO-101 MuJoCo model (from MuJoCo Menagerie), used to draw the camera view |
 | `src/workshop_arm/workshop_arm/vision.py` | Block detection with OpenCV (no ROS) |
 | `src/workshop_arm/workshop_arm/*.py` | Nodes: `sim_camera`, `block_detector`, `spawn_blocks`, `demo`, `vision_demo` |
 | `src/so101-ros-physical-ai/` | SO-101 robot model, controllers and MoveIt config ([upstream](https://github.com/esol-community/so101-ros-physical-ai)) |
@@ -138,8 +138,9 @@ as in step 3) while the launch file is running.
 - The robot packages are patched to `LANGUAGES NONE` and built with Ninja, so no C++ compiler
   (or Visual Studio) is needed.
 - Simulated perception: MuJoCo is used only as a renderer (no physics). MoveIt + ros2_control mock
-  hardware still move the arm; `sim_camera` mirrors `/follower/joint_states` and MoveIt's planning
-  scene into MuJoCo each frame. MuJoCo installs from conda-forge on Linux, macOS and Windows, unlike
+  hardware still move the arm; `sim_camera` builds its model from `/follower/robot_description`
+  (one URDF for MoveIt, RViz and the camera) and mirrors `/follower/joint_states` and MoveIt's
+  planning scene into it each frame. MuJoCo installs from conda-forge on Linux, macOS and Windows, unlike
   Gazebo. On real hardware this node is swapped for a webcam driver.
 - Blocks are allowed to collide with everything in MoveIt (the gripper must touch them); `grab()`
   only succeeds if a block is within 2 cm of the gripper, so bad perception shows up as a miss.

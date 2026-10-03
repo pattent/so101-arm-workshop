@@ -1,9 +1,10 @@
 """A simulated overhead camera, drawn live with MuJoCo.
 
-Every frame it copies the arm's joint angles (/follower/joint_states) onto a 3D model of
-the SO-101, puts the blocks and bins where MoveIt says they are, and renders what a
-camera hanging above the table would see: the real arm (which can block the view!),
-lighting, shadows and perspective. It publishes:
+It builds its 3D arm from the same robot description MoveIt and RViz use
+(/follower/robot_description), so there is only one model of the arm. Every frame it
+copies the arm's joint angles (/follower/joint_states) onto it, puts the blocks and bins
+where MoveIt says they are, and renders what a camera hanging above the table would see:
+the arm (which can block the view!), lighting, shadows and perspective. It publishes:
     /camera/image_raw     sensor_msgs/Image
     /camera/camera_info   sensor_msgs/CameraInfo
 
@@ -14,14 +15,17 @@ MuJoCo is only used as a camera here: MoveIt and ros2_control still move the arm
 """
 
 import math
-import os
+import re
+from pathlib import Path
 
 import mujoco
 import numpy as np
 import rclpy
 from ament_index_python.packages import get_package_share_directory
 from rclpy.node import Node
+from rclpy.qos import DurabilityPolicy, QoSProfile
 from sensor_msgs.msg import CameraInfo, Image, JointState
+from std_msgs.msg import String
 
 from moveit_msgs.msg import PlanningSceneComponents
 from moveit_msgs.srv import GetPlanningScene
@@ -37,15 +41,27 @@ RIM_WIDTH = 0.008
 TABLE_RGBA = [0.80, 0.72, 0.60, 1]
 BIN_FLOOR_RGBA = [0.45, 0.45, 0.45, 1]
 HIDDEN = [0.0, 0.0, -1.0]   # unused blocks/bins wait under the table
-# Where a held block sits, relative to the gripper (gripper_link -> gripper_frame_link in the URDF).
-HELD_BLOCK_OFFSET = np.array([-0.0079, -0.000218, -0.0981])
+GRIPPER_FRAME = 'gripper_frame_link'   # held blocks sit here
 
 
-def build_model():
-    """The SO-101 model + a table, an overhead camera, and spare blocks and bins."""
-    path = os.path.join(get_package_share_directory('workshop_arm'),
-                        'models', 'robotstudio_so101', 'so101.xml')
-    spec = mujoco.MjSpec.from_file(path)
+def urdf_for_mujoco(urdf):
+    """Make a ROS robot description loadable by MuJoCo."""
+    # package://so101_description/meshes/x.stl -> /full/path/to/so101_description/meshes/x.stl
+    urdf = re.sub(r'package://([^/]+)/',
+                  lambda m: Path(get_package_share_directory(m.group(1))).as_posix() + '/', urdf)
+    # Keep the visual meshes, and keep every link (even fixed ones) as its own body.
+    options = '<mujoco><compiler discardvisual="false" fusestatic="false"/></mujoco>'
+    return urdf.replace('</robot>', options + '</robot>')
+
+
+def build_model(urdf):
+    """The robot from its URDF + a table, an overhead camera, and spare blocks and bins."""
+    spec = mujoco.MjSpec.from_string(urdf_for_mujoco(urdf))
+    # The URDF has every part twice: a visual mesh and a collision mesh. Only draw the
+    # visual one (group 3 is hidden by default).
+    for geom in spec.geoms:
+        if geom.contype:
+            geom.group = 3
     spec.visual.global_.offwidth = CAMERA_WIDTH
     spec.visual.global_.offheight = CAMERA_HEIGHT_PX
     world = spec.worldbody
@@ -82,9 +98,7 @@ class SimCamera(Node):
 
     def __init__(self):
         super().__init__('sim_camera')
-        self.model = build_model()
-        self.data = mujoco.MjData(self.model)
-        self.renderer = mujoco.Renderer(self.model, CAMERA_HEIGHT_PX, CAMERA_WIDTH)
+        self.model = None      # built once the robot description arrives
         self.rng = np.random.default_rng()
 
         self.objects = {}      # what MoveIt says is on the table
@@ -92,6 +106,8 @@ class SimCamera(Node):
         self.colors = {}       # remembered colors (held blocks lose theirs in the scene)
         self.pending = None
 
+        latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        self.create_subscription(String, '/follower/robot_description', self.on_robot, latched)
         self.create_subscription(JointState, '/follower/joint_states', self.on_joints, 10)
         self.scene_client = self.create_client(GetPlanningScene, '/get_planning_scene')
         self.image_pub = self.create_publisher(Image, '/camera/image_raw', 1)
@@ -99,10 +115,20 @@ class SimCamera(Node):
         self.create_timer(1.0 / FRAMES_PER_SECOND, self.take_picture)
         self.create_timer(0.1, self.ask_for_scene)
 
+    def on_robot(self, msg):
+        self.model = build_model(msg.data)
+        self.data = mujoco.MjData(self.model)
+        self.renderer = mujoco.Renderer(self.model, CAMERA_HEIGHT_PX, CAMERA_WIDTH)
+        self.get_logger().info('Got the robot description, camera is live.')
+
     def on_joints(self, msg):
+        if self.model is None:
+            return
         for name, position in zip(msg.name, msg.position):
-            joint = self.model.joint(name)
-            self.data.qpos[joint.qposadr[0]] = position
+            try:
+                self.data.qpos[self.model.joint(name).qposadr[0]] = position
+            except KeyError:
+                pass
 
     def ask_for_scene(self):
         if self.pending is None and self.scene_client.service_is_ready():
@@ -125,6 +151,8 @@ class SimCamera(Node):
             self.colors[name] = obj['color']
 
     def take_picture(self):
+        if self.model is None:
+            return
         mujoco.mj_kinematics(self.model, self.data)   # where every arm part is
         self.place_objects()
         mujoco.mj_kinematics(self.model, self.data)
@@ -143,8 +171,7 @@ class SimCamera(Node):
         blocks = [(n, o) for n, o in self.objects.items() if o['kind'] == 'block']
         bins = [(n, o) for n, o in self.objects.items() if o['kind'] == 'bin']
 
-        gripper = self.data.body('gripper')
-        held_at = gripper.xpos + gripper.xmat.reshape(3, 3) @ HELD_BLOCK_OFFSET
+        held_at = self.data.body(GRIPPER_FRAME).xpos
         blocks += [(n, {'x': held_at[0], 'y': held_at[1], 'z': held_at[2],
                         'color': self.colors.get(n, (0.5, 0.5, 0.5))}) for n in self.held]
 
