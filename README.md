@@ -24,7 +24,15 @@ Then close and reopen your terminal.
 > **Windows:** put this folder somewhere with a short path, like `C:\so101`. Windows has
 > trouble with very long file paths.
 
-## 2. Install ROS 2 and set up the workspace (one time, ~5 minutes, ~6 GB)
+## 2. Download this workshop
+
+```bash
+pixi global install git    # only if you don't already have git
+git clone https://github.com/pattent/so101-arm-workshop.git
+cd so101-arm-workshop
+```
+
+## 3. Install ROS 2 and set up the workspace (one time, ~5 minutes, ~6 GB)
 
 From inside this folder:
 ```bash
@@ -34,24 +42,24 @@ python scripts/setup_workspace.py   # downloads the SO-101 robot packages
 colcon build                        # builds the workspace
 ```
 
-## 3. Every new terminal
+## 4. Every new terminal
 
 ```bash
-cd so101_workshop
+cd so101-arm-workshop
 pixi shell                     # ROS 2 Jazzy (like `source /opt/ros/jazzy/setup.bash`)
 source install/setup.bash      # our workspace   (Windows: call install\setup.bat)
 ```
 
 Re-run the `source` line after every `colcon build`.
 
-## 4. See the robot move
+## 5. See the robot move
 
 Terminal 1: start the simulated arm, controllers, MoveIt and RViz:
 ```bash
 ros2 launch so101_bringup follower_moveit_demo.launch.py hardware_type:=mock
 ```
 
-Terminal 2: run a pick-and-place demo:
+Terminal 2: sort a red and a blue block into matching bins:
 ```bash
 ros2 run workshop_arm demo
 ```
