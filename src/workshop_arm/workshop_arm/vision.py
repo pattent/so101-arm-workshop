@@ -7,6 +7,9 @@ image, including one from your laptop's webcam.
 import cv2
 import numpy as np
 
+# Our images are small: one thread is plenty, and stops OpenCV from hogging every CPU core.
+cv2.setNumThreads(1)
+
 from workshop_arm.arm import BLOCK_SIZE
 from workshop_arm.table import CAMERA_HEIGHT, CAMERA_X, CAMERA_Y
 

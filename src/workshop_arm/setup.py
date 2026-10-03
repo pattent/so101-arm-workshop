@@ -23,7 +23,7 @@ setup(
     entry_points={
         'console_scripts': [
             'demo = workshop_arm.demo:main',
-            'sim_camera = workshop_arm.sim_camera:main',
+            'sim_view = workshop_arm.sim_view:main',
             'block_detector = workshop_arm.block_detector:main',
             'spawn_blocks = workshop_arm.spawn_blocks:main',
             'vision_demo = workshop_arm.vision_demo:main',

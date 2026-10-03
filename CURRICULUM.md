@@ -122,7 +122,7 @@ Simulation: `stage:=2` (bins and blocks at the known spots in `table.py`).
 
 ### Module 11: Computer vision with OpenCV
 Simulation: `stage:=3` (random blocks + a live overhead camera).
-- Together: look at `/camera/image_raw` in `rqt_image_view`. What does the robot "see"? Move the arm: it blocks the view!
+- Together: watch the simulation window, then open the raw topic with `ros2 run rqt_image_view rqt_image_view /camera/image_raw`. What does the robot "see"? Move the arm: it blocks the view!
 - Together: build a color mask (HSV thresholding) for one color and display it; tune the ranges.
 - Together: find contours, filter by size (why do the bins not count as blocks?), mark the centers.
 - Challenge: add yellow blocks: a new color range in `vision.py` (and a yellow bin in `table.py`).

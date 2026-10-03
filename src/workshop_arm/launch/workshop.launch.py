@@ -4,11 +4,15 @@
     ros2 launch workshop_arm workshop.launch.py stage:=2   # + bins and blocks at known spots (Module 10)
     ros2 launch workshop_arm workshop.launch.py stage:=3   # + random blocks, live camera, detector (11-12)
 
+A window shows the live 3D view of the table (and, in stage 3, what the camera sees).
+
 Options:
     blocks:=8          how many random blocks in stage 3
     seed:=42           same random layout every time
     camera:=true       turn the camera on in stage 1 or 2 (it's on by default in stage 3)
     detector:=false    in stage 3, don't run our block detector (use yours instead!)
+    rviz:=false        don't open RViz (lighter on slow laptops; you lose drag-to-plan)
+    view:=false        don't open the 3D view window
 """
 
 from launch import LaunchDescription
@@ -30,7 +34,7 @@ def setup(context):
     actions = [IncludeLaunchDescription(
         PathJoinSubstitution([FindPackageShare('so101_bringup'), 'launch',
                               'follower_moveit_demo.launch.py']),
-        launch_arguments={'hardware_type': 'mock'}.items(),
+        launch_arguments={'hardware_type': 'mock', 'use_rviz': arg('rviz')}.items(),
     )]
 
     # Stage 2: bins and blocks at known spots. Stage 3: blocks at random spots.
@@ -42,14 +46,13 @@ def setup(context):
         actions.append(Node(package='workshop_arm', executable='spawn_blocks',
                             arguments=layout, output='screen'))
 
-    if camera:
-        actions.append(Node(package='workshop_arm', executable='sim_camera', output='screen'))
+    # The live 3D view window (and the overhead camera, if it's on), drawn with MuJoCo.
+    view = arg('view') == 'true'
+    if view or camera:
+        actions.append(Node(package='workshop_arm', executable='sim_view', output='screen',
+                            parameters=[{'camera': camera, 'window': view}]))
     if detector:
         actions.append(Node(package='workshop_arm', executable='block_detector', output='screen'))
-    if camera:
-        topic = '/vision/debug_image' if detector else '/camera/image_raw'
-        actions.append(Node(package='rqt_image_view', executable='rqt_image_view',
-                            arguments=[topic]))
     return actions
 
 
@@ -60,5 +63,7 @@ def generate_launch_description():
         DeclareLaunchArgument('seed', default_value=''),
         DeclareLaunchArgument('camera', default_value=''),
         DeclareLaunchArgument('detector', default_value=''),
+        DeclareLaunchArgument('rviz', default_value='true'),
+        DeclareLaunchArgument('view', default_value='true'),
         OpaqueFunction(function=setup),
     ])
