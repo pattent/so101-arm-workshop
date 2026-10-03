@@ -70,6 +70,7 @@ GRIPPER_LINKS = ['gripper_link', 'gripper_frame_link', 'moving_jaw_so101_v1_link
 BLOCK_SIZE = 0.025
 BIN_SIZE = 0.10
 BIN_HEIGHT = 0.01
+GRAB_TOLERANCE = 0.02   # how close (m) the gripper must be to a block to catch it
 COLORS = {
     'red': (0.9, 0.1, 0.1),
     'green': (0.1, 0.8, 0.2),
@@ -77,6 +78,39 @@ COLORS = {
     'yellow': (0.95, 0.85, 0.1),
     'gray': (0.5, 0.5, 0.5),
 }
+
+
+def color_rgb(color):
+    if color not in COLORS:
+        raise ValueError(f'Unknown color {color!r}. Try one of: {list(COLORS)}')
+    return COLORS[color]
+
+
+def scene_request():
+    """A request for the objects (and their colors) in MoveIt's planning scene."""
+    request = GetPlanningScene.Request()
+    request.components.components = (PlanningSceneComponents.WORLD_OBJECT_GEOMETRY
+                                      | PlanningSceneComponents.OBJECT_COLORS)
+    return request
+
+
+def objects_in_scene(scene):
+    """Turn a PlanningScene message into {name: {'kind', 'x', 'y', 'z', 'color'}}."""
+    colors = {c.id: (c.color.r, c.color.g, c.color.b) for c in scene.object_colors}
+    objects = {}
+    for obj in scene.world.collision_objects:
+        if not obj.primitives:
+            continue
+        offset = obj.primitive_poses[0].position
+        size = obj.primitives[0].dimensions
+        objects[obj.id] = {
+            'kind': 'block' if abs(size[2] - BLOCK_SIZE) < 1e-4 else 'bin',
+            'x': obj.pose.position.x + offset.x,
+            'y': obj.pose.position.y + offset.y,
+            'z': obj.pose.position.z + offset.z,
+            'color': colors.get(obj.id, COLORS['gray']),
+        }
+    return objects
 
 
 class Arm:
@@ -95,9 +129,7 @@ class Arm:
 
         self._scene_client = self.node.create_client(ApplyPlanningScene, '/apply_planning_scene')
         self._get_scene_client = self.node.create_client(GetPlanningScene, '/get_planning_scene')
-        self._bins = {}        # name -> (x, y)
-        self._colors = {}      # object name -> color name
-        self._holding = None   # name of the block in the gripper, if any
+        self._holding = None   # (name, color) of the block in the gripper, if any
 
         self._tf_buffer = Buffer()
         self._tf_listener = TransformListener(self._tf_buffer, self.node)
@@ -176,19 +208,53 @@ class Arm:
 
     def add_block(self, name, x, y, color='red'):
         """Put a small cube on the table at (x, y)."""
-        self._add_box(name, x, y, BLOCK_SIZE / 2, [BLOCK_SIZE] * 3, color)
+        self._add_box(name, x, y, BLOCK_SIZE / 2, [BLOCK_SIZE] * 3, color_rgb(color))
         # The gripper has to touch blocks to pick them up, so MoveIt shouldn't
         # treat them as obstacles.
         self._allow_collisions(name)
 
     def add_bin(self, name, x, y, color='gray'):
         """Put a flat bin (a colored square) on the table at (x, y)."""
-        self._bins[name] = (x, y)
-        self._add_box(name, x, y, BIN_HEIGHT / 2, [BIN_SIZE, BIN_SIZE, BIN_HEIGHT], color)
+        self._add_box(name, x, y, BIN_HEIGHT / 2, [BIN_SIZE, BIN_SIZE, BIN_HEIGHT],
+                      color_rgb(color))
 
-    def grab(self, name):
-        """Close the gripper and attach the block, so it moves with the arm."""
+    def remove(self, name):
+        """Take an object off the table."""
+        scene = PlanningScene(is_diff=True)
+        scene.world.collision_objects.append(
+            CollisionObject(id=name, operation=CollisionObject.REMOVE))
+        self._apply_scene(scene)
+
+    def clear_table(self):
+        """Take every block and bin off the table."""
+        for name in self.get_objects():
+            self.remove(name)
+
+    def get_objects(self):
+        """Everything on the table: {name: {'kind', 'x', 'y', 'z', 'color'}}."""
+        return objects_in_scene(self._call(self._get_scene_client, scene_request()).scene)
+
+    def grab(self, name=None):
+        """Close the gripper and pick up the block between the fingers.
+
+        Returns True if a block was caught. If the gripper is in the wrong spot,
+        it closes on nothing and returns False, just like a real robot.
+        """
         self.close_gripper()
+        x, y, z = self.where_am_i()
+        objects = self.get_objects()
+        caught = [
+            n for n, obj in objects.items()
+            if obj['kind'] == 'block'
+            and math.hypot(obj['x'] - x, obj['y'] - y) < GRAB_TOLERANCE
+            and abs(obj['z'] - z) < GRAB_TOLERANCE
+            and (name is None or n == name)
+        ]
+        if not caught:
+            self._log('Missed! There is no block between the fingers.')
+            return False
+        name = caught[0]
+
         held = AttachedCollisionObject()
         held.link_name = GRIPPER_FRAME
         held.touch_links = GRIPPER_LINKS
@@ -200,14 +266,16 @@ class Arm:
         scene.world.collision_objects.append(
             CollisionObject(id=name, operation=CollisionObject.REMOVE))
         self._apply_scene(scene)
-        self._holding = name
+        self._holding = (name, objects[name]['color'])
+        self._log(f'Got {name}!')
+        return True
 
     def release(self):
         """Open the gripper and drop the block below it (onto a bin, if there is one)."""
         self.open_gripper()
         if self._holding is None:
             return
-        name, self._holding = self._holding, None
+        (name, color), self._holding = self._holding, None
 
         detach = AttachedCollisionObject(link_name=GRIPPER_FRAME)
         detach.object.id = name
@@ -219,10 +287,11 @@ class Arm:
 
         x, y, _ = self.where_am_i()
         z = BLOCK_SIZE / 2
-        for bin_x, bin_y in self._bins.values():
-            if abs(x - bin_x) < BIN_SIZE / 2 and abs(y - bin_y) < BIN_SIZE / 2:
+        for obj in self.get_objects().values():
+            if (obj['kind'] == 'bin' and abs(x - obj['x']) < BIN_SIZE / 2
+                    and abs(y - obj['y']) < BIN_SIZE / 2):
                 z += BIN_HEIGHT
-        self._add_box(name, x, y, z, [BLOCK_SIZE] * 3, self._colors[name])
+        self._add_box(name, x, y, z, [BLOCK_SIZE] * 3, color)
 
     # ----- Where is the arm? ---------------------------------------------
 
@@ -285,11 +354,8 @@ class Arm:
         box.primitive_poses.append(pose)
         return box
 
-    def _add_box(self, name, x, y, z, size, color):
-        if color not in COLORS:
-            raise ValueError(f'Unknown color {color!r}. Try one of: {list(COLORS)}')
-        self._colors[name] = color
-        r, g, b = COLORS[color]
+    def _add_box(self, name, x, y, z, size, rgb):
+        r, g, b = rgb
         scene = PlanningScene(is_diff=True)
         scene.world.collision_objects.append(self._box(name, BASE_FRAME, x, y, z, size))
         scene.object_colors.append(ObjectColor(id=name, color=ColorRGBA(r=r, g=g, b=b, a=1.0)))

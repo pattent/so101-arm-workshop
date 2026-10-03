@@ -1,6 +1,6 @@
 # SO-101 Workshop Curriculum (draft)
 
-**Final project: the color-sorting robot.** A webcam spots colored blocks on the table, and the
+**Final project: the color-sorting robot.** A camera spots colored blocks on the table, and the
 SO-101 arm picks each one up and drops it in the bin of the same color, first in simulation and
 later, if she wants, on a real arm with the same code.
 
@@ -19,7 +19,7 @@ stack from webcam pixels to motor commands.
 |---|---|---|
 | 🥉 Bronze | Program a "robot dance": a routine of poses and gripper moves | Module 3 |
 | 🥈 Silver | Sort 3 blocks from known positions into bins, avoiding obstacles | Module 10 |
-| 🥇 Gold | Webcam finds the blocks, arm sorts them automatically | Module 12 |
+| 🥇 Gold | The camera finds the blocks (simulated first), arm sorts them automatically | Module 12 |
 
 ## Working backwards: the skills Gold needs
 
@@ -110,14 +110,20 @@ URDF, links and joints, TF frames, RViz.
 ## Part 5: Seeing the world
 
 ### Module 11: Computer vision with OpenCV
-- Together: open the laptop webcam with OpenCV; show the image.
-- Together: color thresholding (HSV) to find red, blue and green paper squares; draw boxes around them.
-- Challenge: print the center pixel of every block it sees, labeled by color.
+Starts with the simulated overhead camera (`ros2 launch workshop_arm perception_sim.launch.py`).
+- Together: look at `/camera/image_raw` in `rqt_image_view`. What does the robot "see"?
+- Together: build a color mask (HSV thresholding) for one color and display it; tune the ranges.
+- Together: find contours, filter by size (why do the bins not count as blocks?), mark the centers.
+- Challenge: add yellow blocks: a new color range in `vision.py` (and a yellow bin in `table.py`).
+- Bonus: run the same `find_blocks()` on a photo from her laptop webcam of colored paper squares.
 
 ### Module 12: Pixels to the real world → 🥇 Gold
-- Together: calibrate: 4 marked corners on a sheet of paper → pixel-to-table transform (homography).
-- Together: a ROS node that publishes detected block positions.
-- **Gold challenge:** blocks on the paper in front of the webcam → simulated arm sorts them in RViz. Demo day!
+- Together: the pinhole camera model: why does `pixel_to_table()` need the camera's height and focal length?
+- Together: check accuracy: compare detected positions with where the blocks really are.
+- Together: read `block_detector.py`: turning a function into a ROS node that publishes `/detected_blocks`.
+- **Gold challenge:** write her own version of `vision_demo`: look → pick → place → look again
+  until the table is clean. Stretch: sort the closest block first; recover from a missed grab.
+- (Real webcam later: calibrate with 4 marked corners on paper → homography, replacing the pinhole math.)
 
 ---
 
@@ -130,5 +136,6 @@ URDF, links and joints, TF frames, RViz.
 ## Open items for instructors
 
 - [ ] Dry-run the install on a real Windows laptop and a real Mac (only tested on Linux so far).
-- [ ] Build the RViz block/bin visualization helpers for Module 10.
+- [x] Build the RViz block/bin visualization helpers for Module 10.
+- [x] Simulated overhead camera + block detector for Modules 11–12.
 - [ ] Write the exercise starter files and solutions for each module.

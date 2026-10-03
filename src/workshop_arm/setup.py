@@ -1,3 +1,5 @@
+from glob import glob
+
 from setuptools import setup
 
 package_name = 'workshop_arm'
@@ -9,6 +11,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/launch', glob('launch/*.launch.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -19,6 +22,10 @@ setup(
     entry_points={
         'console_scripts': [
             'demo = workshop_arm.demo:main',
+            'sim_camera = workshop_arm.sim_camera:main',
+            'block_detector = workshop_arm.block_detector:main',
+            'spawn_blocks = workshop_arm.spawn_blocks:main',
+            'vision_demo = workshop_arm.vision_demo:main',
         ],
     },
 )

@@ -5,15 +5,13 @@ Run it (with the robot launch file already running in another terminal):
 """
 
 from workshop_arm import Arm
+from workshop_arm.table import BINS
 
-# Where things are on the table (x forward, y left), in meters.
+# Where the blocks are on the table (x forward, y left), in meters.
+# (Here we just type them in. vision_demo finds them with the camera instead.)
 BLOCKS = {
     'red_block': (0.22, -0.10, 'red'),
     'blue_block': (0.28, 0.02, 'blue'),
-}
-BINS = {
-    'red': (0.12, 0.22),
-    'blue': (0.24, 0.20),
 }
 GRAB_Z = 0.015   # gripper height for grabbing a block
 SAFE_Z = 0.12    # height for moving around without hitting anything
@@ -35,6 +33,7 @@ def main():
     arm = Arm()
 
     # Set up the table.
+    arm.clear_table()
     for color, (x, y) in BINS.items():
         arm.add_bin(f'{color}_bin', x, y, color=color)
     for name, (x, y, color) in BLOCKS.items():

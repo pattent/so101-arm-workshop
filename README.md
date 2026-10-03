@@ -66,6 +66,33 @@ ros2 run workshop_arm demo
 
 Then try dragging the arm's marker in RViz and clicking **Plan & Execute**.
 
+## 6. Let the robot find the blocks itself (perception)
+
+In `demo`, we typed in where the blocks are. Here a (simulated) overhead camera
+looks at the table, OpenCV finds the blocks, and the arm sorts whatever it sees.
+
+Terminal 1: arm + MoveIt + RViz + camera + block detector + a camera viewer window:
+```bash
+ros2 launch workshop_arm perception_sim.launch.py
+```
+
+Terminal 2: scatter blocks at random spots, then sort them using only the camera:
+```bash
+ros2 run workshop_arm spawn_blocks        # 5 random blocks (try: spawn_blocks 8)
+ros2 run workshop_arm vision_demo
+```
+
+How it fits together:
+```
+sim_camera  --/camera/image_raw-->  block_detector  --/detected_blocks-->  vision_demo  -->  MoveIt  -->  arm
+(draws the table                    (OpenCV: color mask,                    (look, pick,
+ from above)                         contours, pixel -> meters)              place, repeat)
+```
+
+The camera viewer shows `/vision/debug_image`: what the detector found, with each
+block's position on the table. The detector code is in `workshop_arm/vision.py`.
+It's plain OpenCV, so the same functions work on a real webcam picture.
+
 ## Writing your own code
 
 ```python
@@ -78,6 +105,11 @@ arm.move_to(0.25, 0.0, 0.10)          # gripper position in meters (x forward, y
 arm.open_gripper()
 arm.close_gripper()
 print(arm.where_am_i())               # current gripper (x, y, z)
+
+arm.add_bin('red_bin', 0.12, 0.22, color='red')       # objects show up in RViz
+arm.add_block('my_block', 0.25, -0.05, color='red')
+arm.grab()        # True if a block is between the fingers (it then moves with the arm)
+arm.release()     # drops it below the gripper
 arm.shutdown()
 ```
 
@@ -91,7 +123,10 @@ as in step 3) while the launch file is running.
 | `pixi.toml` | Everything we install (ROS 2, MoveIt, OpenCV...) |
 | `colcon_defaults.yaml` | Default `colcon build` options (used automatically inside `pixi shell`) |
 | `scripts/setup_workspace.py` | Downloads the SO-101 packages and adapts them for the workshop |
-| `src/workshop_arm/` | The beginner-friendly `Arm` helper and the demo |
+| `src/workshop_arm/workshop_arm/arm.py` | The beginner-friendly `Arm` helper |
+| `src/workshop_arm/workshop_arm/table.py` | Workcell layout: bin positions, block area, camera position |
+| `src/workshop_arm/workshop_arm/vision.py` | Block detection with OpenCV (no ROS) |
+| `src/workshop_arm/workshop_arm/*.py` | Nodes: `sim_camera`, `block_detector`, `spawn_blocks`, `demo`, `vision_demo` |
 | `src/so101-ros-physical-ai/` | SO-101 robot model, controllers and MoveIt config ([upstream](https://github.com/esol-community/so101-ros-physical-ai)) |
 
 ## Notes for instructors
@@ -103,5 +138,10 @@ as in step 3) while the launch file is running.
 - `moveit_py` is not available on Windows, so `workshop_arm` talks to MoveIt using plain ROS 2 actions.
 - The robot packages are patched to `LANGUAGES NONE` and built with Ninja, so no C++ compiler
   (or Visual Studio) is needed.
+- Simulated perception: `sim_camera` renders MoveIt's planning scene from above (pinhole model, with
+  noise and blur) instead of using Gazebo, so it works on every OS. It does not draw the arm itself,
+  so a held block simply disappears from view. On real hardware this node is swapped for a webcam driver.
+- Blocks are allowed to collide with everything in MoveIt (the gripper must touch them); `grab()`
+  only succeeds if a block is within 2 cm of the gripper, so bad perception shows up as a miss.
 - If your own `~/.bashrc` sources another ROS install (e.g. Humble), start from a clean shell first:
   `env -i HOME=$HOME PATH=/usr/bin:/bin:$HOME/.pixi/bin DISPLAY=$DISPLAY TERM=$TERM bash --noprofile --norc`
