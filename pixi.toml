@@ -1,0 +1,39 @@
+[workspace]
+name = "so101-workshop"
+description = "ROS 2 Jazzy + MoveIt 2 + SO-101 arm workshop environment (no VM, no apt)"
+channels = ["robostack-jazzy", "conda-forge"]
+platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
+
+[dependencies]
+python = "3.12.*"
+
+# ROS 2 core + visualization
+ros-jazzy-desktop = "*"
+ros-jazzy-xacro = "*"
+ros-jazzy-joint-state-publisher-gui = "*"
+
+# Arm control and motion planning
+ros-jazzy-ros2-control = "*"
+ros-jazzy-ros2-controllers = "*"
+ros-jazzy-moveit = "*"
+
+# Build tools (no C++ compiler needed: our packages are Python, models and config)
+colcon-common-extensions = "*"
+setuptools = "*"
+cmake = "*"
+ninja = "*"
+
+# Downloads the SO-101 packages (git is included so students don't need to install it)
+git = "*"
+
+# Python libraries for lessons (vision, math, plotting)
+numpy = "*"
+opencv = "*"
+matplotlib = "*"
+
+# Default colcon options, so students can type a plain `colcon build`.
+[target.unix.activation.env]
+COLCON_DEFAULTS_FILE = "$PIXI_PROJECT_ROOT/colcon_defaults.yaml"
+
+[target.win-64.activation.env]
+COLCON_DEFAULTS_FILE = "%PIXI_PROJECT_ROOT%\\colcon_defaults.yaml"

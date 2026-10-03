@@ -1,0 +1,13 @@
+# pixi environment (recreated by `pixi install`)
+.pixi/
+
+# colcon output (recreated by `colcon build`)
+build/
+install/
+log/
+
+# Downloaded by scripts/setup_workspace.py
+src/so101-ros-physical-ai/
+
+__pycache__/
+*.pyc
