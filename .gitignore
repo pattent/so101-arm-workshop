@@ -11,3 +11,6 @@ src/so101-ros-physical-ai/
 
 __pycache__/
 *.pyc
+
+# Local notes for AI assistants (kept on the dev machine, not published)
+CLAUDE.md

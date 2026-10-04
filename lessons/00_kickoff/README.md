@@ -38,7 +38,8 @@ pixi shell                     # 1. turn on ROS 2
 source install/setup.bash      # 2. load our workspace
 ros2 launch workshop_arm workshop.launch.py stage:=1    # 3. start the simulation
 ```
-(On Windows, step 2 is `install\setup.ps1` in PowerShell, or `call install\setup.bat`.)
+(On Windows, step 2 is `install\local_setup.ps1` in PowerShell, or `call install\local_setup.bat` in
+Command Prompt.)
 
 ## 5. Talk about it
 

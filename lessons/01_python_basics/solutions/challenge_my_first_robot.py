@@ -23,5 +23,16 @@ print('Pointing up, gripper at', arm.where_am_i())
 arm.move_joints(45, 0, 0, 30, 90)
 print('My pose, gripper at', arm.where_am_i())
 
+
+# Bonus
+def show_pose(arm, pan):
+    arm.move_joints(pan, -45, 45, 45, 0)
+    print(f'With shoulder_pan at {pan}, the gripper is at', arm.where_am_i())
+
+
+show_pose(arm, -60)
+show_pose(arm, 0)
+show_pose(arm, 60)
+
 arm.go_to('rest')
 arm.shutdown()

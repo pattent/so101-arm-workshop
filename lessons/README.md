@@ -18,18 +18,22 @@ understand the whole thing, from camera pixels to motor commands.
 | # | Lesson | You'll learn | Simulation | Status |
 |---|---|---|---|---|
 | 0 | [Kickoff](00_kickoff/) | Where we're going; install everything | stage 3 | ✅ ready |
-| 1 | [Python basics](01_python_basics/) | Variables, `print`, math, *using* functions; first robot moves | stage 1 | ✅ ready |
-| 2 | [Loops and functions](02_loops_and_functions/) | Lists, `for` loops, *writing* functions (`def`, `return`); draw shapes in the air | stage 1 | ✅ ready |
-| 3 | [Decisions and classes](03_decisions_and_classes/) | `if`, dictionaries, classes. 🥉 **Bronze** | stage 1 | ✅ ready |
-| 4 | [Forward kinematics](04_forward_kinematics/) | Coordinates; joint angles → gripper position | stage 1 | outline |
-| 5 | [Inverse kinematics](05_inverse_kinematics/) | Gripper position → joint angles | stage 1 | outline |
-| 6 | [Nodes and topics](06_nodes_and_topics/) | How ROS 2 programs talk | stage 1 | outline |
-| 7 | [Writing nodes](07_writing_nodes/) | Your own publishers and subscribers | stage 1 | outline |
-| 8 | [Robot models and TF](08_robot_models_and_tf/) | URDF, coordinate frames | stage 1 | outline |
-| 9 | [MoveIt and obstacles](09_moveit_and_obstacles/) | Motion planning around things | stage 1 | outline |
-| 10 | [Pick and place](10_pick_and_place/) | Grabbing and sorting. 🥈 **Silver** | stage 2 | outline |
-| 11 | [Computer vision](11_computer_vision/) | Finding blocks with OpenCV | stage 3 | outline |
-| 12 | [Pixels to the real world](12_pixels_to_world/) | Camera math; the robot sorts by itself. 🥇 **Gold** | stage 3 | outline |
+| 1 | [Python basics](01_python_basics/) | Variables and types, math, *using* functions and objects; first robot moves | stage 1 | ✅ ready |
+| 2 | [Lists and loops](02_lists_and_loops/) | Lists, tuples, `for` loops, `range`; sweep the arm, draw shapes | stage 1 | ✅ ready |
+| 3 | [Functions](03_functions/) | *Writing* functions (`def`, `return`); wave, a shape-drawing robot | stage 1 | ✅ ready |
+| 4 | [Decisions and dictionaries](04_decisions_and_dictionaries/) | `if`, `while`, dictionaries. 🥉 **Bronze** | stage 1 | ✅ ready |
+| 5 | [Classes](05_classes/) | Writing classes, inside `Arm`, inheritance | stage 1 | ✅ ready |
+| 6 | [Python for robots](06_python_for_robots/) | Callbacks, errors, your own modules | none | ✅ ready |
+| 7 | [Forward kinematics](07_forward_kinematics/) | Coordinates; joint angles → gripper position | stage 1 | outline |
+| 8 | [Inverse kinematics](08_inverse_kinematics/) | Gripper position → joint angles | stage 1 | outline |
+| 9 | [Nodes and topics](09_nodes_and_topics/) | How ROS 2 programs talk; exploring with `ros2` commands | stage 1 | ✅ ready |
+| 10 | [Writing nodes](10_writing_nodes/) | Your own subscribers, publishers and timers | stage 1 | ✅ ready |
+| 11 | [Packages and launch files](11_packages_and_launch/) | `colcon build`, `ros2 run`, parameters; your own package and launch files | stage 1 | ✅ ready |
+| 12 | [Robot models and TF](12_robot_models_and_tf/) | URDF, coordinate frames | stage 1 | outline |
+| 13 | [MoveIt and obstacles](13_moveit_and_obstacles/) | Motion planning around things | stage 1 | outline |
+| 14 | [Pick and place](14_pick_and_place/) | Grabbing and sorting. 🥈 **Silver** | stage 2 | outline |
+| 15 | [Computer vision](15_computer_vision/) | Images as NumPy arrays; finding blocks with OpenCV | stage 3 | outline |
+| 16 | [Pixels to the real world](16_pixels_to_world/) | Camera math; the robot sorts by itself. 🥇 **Gold** | stage 3 | outline |
 
 "Outline" means the lesson plan is written, but the starter files and solutions are still to come.
 
@@ -37,9 +41,9 @@ understand the whole thing, from camera pixels to motor commands.
 
 | Tier | Goal | Unlocked after |
 |---|---|---|
-| 🥉 Bronze | Program a 30-second "robot dance" | Lesson 3 |
-| 🥈 Silver | Sort 3 blocks from known positions into matching bins | Lesson 10 |
-| 🥇 Gold | The camera finds the blocks, and the arm sorts them by itself | Lesson 12 |
+| 🥉 Bronze | Program a 30-second "robot dance" | Lesson 4 |
+| 🥈 Silver | Sort 3 blocks from known positions into matching bins | Lesson 14 |
+| 🥇 Gold | The camera finds the blocks, and the arm sorts them by itself | Lesson 16 |
 
 ## Simulation stages
 
@@ -47,22 +51,23 @@ The simulation grows with you: `ros2 launch workshop_arm workshop.launch.py stag
 
 | Stage | What's in the simulation | Lessons |
 |---|---|---|
-| 1 | The arm on an empty table | 1–9 |
-| 2 | + bins, and blocks at known spots | 10 |
-| 3 | + blocks at random spots, a live overhead camera, a block detector | 0, 11–12 |
+| 1 | The arm on an empty table | 1–13 |
+| 2 | + bins, and blocks at known spots | 14 |
+| 3 | + blocks at random spots, a live overhead camera, a block detector | 0, 15–16 |
 
 ## Working backwards: the skills Gold needs
 
 ```
 Gold: camera → block positions → arm sorts them
- ├─ Vision: OpenCV color detection, pixels → table coordinates     (Lessons 11–12)
- ├─ Manipulation: pick/place, obstacles, MoveIt                    (Lessons 9–10)
- ├─ ROS 2: nodes, topics, actions, TF, robot models                (Lessons 6–8)
- ├─ Arm geometry: coordinates, forward & inverse kinematics        (Lessons 4–5)
- └─ Python: variables → loops → functions → classes                (Lessons 1–3)
+ ├─ Vision: NumPy images, OpenCV color detection, pixels → table   (Lessons 15–16)
+ ├─ Manipulation: pick/place, obstacles, MoveIt                    (Lessons 13–14)
+ ├─ ROS 2: nodes, topics, packages, launch files, TF, models       (Lessons 9–12)
+ ├─ Arm geometry: coordinates, forward & inverse kinematics        (Lessons 7–8)
+ └─ Python: types → lists → loops → functions → dictionaries
+            → classes → callbacks                                  (Lessons 1–6)
 ```
 
-## Beyond (her call)
+## Beyond (your call)
 
 - **Real hardware:** build or buy an SO-101 arm; the same code runs with `hardware_type:=real`.
 - **Real physics:** turn on MuJoCo's physics so grasps can slip and blocks can tumble.
@@ -73,8 +78,9 @@ Gold: camera → block positions → arm sorts them
 
 See the [instructor guide](../docs/instructor_guide.md) for session prep and timing.
 
-- [ ] Dry-run the install on a real Windows laptop and a real Mac (only tested on Linux so far).
-- [ ] Starter files and solutions for Lessons 4–12.
+- [x] Install on a real Windows laptop (works; use `install\local_setup.ps1`).
+- [ ] Install on a real Mac (only Linux and Windows tested so far).
+- [ ] Starter files and solutions for Lessons 7–8 and 12–16.
 - Run a lesson's exercises from inside its folder, in a terminal with `pixi shell` and
   `source install/setup.bash`. Exercises that move the robot need the simulation running in
   another terminal.

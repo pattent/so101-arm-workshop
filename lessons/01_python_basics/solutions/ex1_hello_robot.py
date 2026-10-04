@@ -19,3 +19,17 @@ print(f'Nice to meet you, {my_name}!')
 # TODO 3
 number_of_joints = number_of_joints + 1
 print('After the upgrade I have', number_of_joints, 'joints.')
+
+gripper_is_open = True
+print(type(number_of_joints), type(reach_in_meters), type(robot_name), type(gripper_is_open))
+
+# TODO 4: dividing with / always gives a float, even when it comes out even.
+print(5 / 2, type(5 / 2))      # 2.5 <class 'float'>
+print(4 / 2, type(4 / 2))      # 2.0 <class 'float'>
+print(5 * 2, type(5 * 2))      # 10 <class 'int'>
+
+# TODO 5: + joins text together, but adds numbers.
+print('5' + '5')               # 55
+print(5 + 5)                   # 10
+# print('5' + 5) fails with: TypeError: can only concatenate str (not "int") to str
+print(int('5') + 5)            # 10

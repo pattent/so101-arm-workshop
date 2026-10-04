@@ -18,16 +18,18 @@ If a pose is impossible (out of reach, or the arm would hit itself or the table)
 the arm stays put and prints a message. That's fine: try different numbers!
 """
 
-# workshop_arm is our own package (in src/workshop_arm/). Arm is the robot arm.
+# workshop_arm is our own package (in src/workshop_arm/). Like `import math`, but this
+# takes just one thing out of it: the Arm class.
 from workshop_arm import Arm
 
-arm = Arm()     # connect to the robot (the simulation must be running)
+arm = Arm()     # make the robot object (exercise 4), which connects to the simulation
 
 print('Going to the rest pose...')
-arm.go_to('rest')
+arm.go_to('rest')                      # a method, with one input: the pose's name
 
 # This pose works. Watch where the arm goes.
-arm.move_joints(0, -45, 45, 45, 0)
+arm.move_joints(0, -45, 45, 45, 0)     # a method with five inputs, in order (see above)
+# where_am_i gives back three numbers: the gripper's x, y and z, in meters.
 print('The gripper is now at', arm.where_am_i())
 
 # TODO 1: Make the arm turn to its LEFT. (Which joint? Positive or negative?)
@@ -37,5 +39,9 @@ print('The gripper is now at', arm.where_am_i())
 
 # TODO 3: Invent your own pose. Print where the gripper ended up.
 
+# Bonus: write a function show_pose(arm, pan) that moves the arm to
+#        (pan, -45, 45, 45, 0) and prints where the gripper is. A function's input can be
+#        the robot itself! Call it three times: with -60, 0 and 60.
+
 arm.go_to('rest')
-arm.shutdown()
+arm.shutdown()                         # disconnect from the simulation

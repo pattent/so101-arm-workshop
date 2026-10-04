@@ -9,9 +9,10 @@ Runs natively on **Windows, macOS and Linux**: no virtual machine needed. We use
 on Windows). After that, everything is the standard ROS 2 workflow: `source`, `colcon build`,
 `ros2 launch`, `ros2 run`.
 
-> **Status:** fully tested on Ubuntu Linux. Every package is available for Windows and macOS
-> (Intel and Apple Silicon), but those haven't been tried on a real machine yet. If something
-> breaks there, see [Troubleshooting](#troubleshooting).
+> **Status:** fully tested on Ubuntu Linux. The install also works on a Windows laptop (with
+> the small fixes in this repo). Every package is available for macOS too (Intel and Apple
+> Silicon), but that hasn't been tried on a real Mac yet. If something breaks, see
+> [Troubleshooting](#troubleshooting).
 
 ## Setup (one time, about 10 minutes)
 
@@ -62,8 +63,10 @@ pixi shell                     # ROS 2 Jazzy (like `source /opt/ros/jazzy/setup.
 source install/setup.bash      # our workspace
 ```
 
-On Windows, the last line is `install\setup.ps1` in PowerShell, or `call install\setup.bat` in
-Command Prompt. Run it again after every `colcon build`.
+On Windows, the last line is `install\local_setup.ps1` in PowerShell (tested), or
+`call install\local_setup.bat` in Command Prompt. (Not `setup.ps1`: under pixi it tries to
+reload ROS from a path that doesn't exist on Windows. `pixi shell` has already turned ROS on,
+so `local_setup` only needs to add our workspace.) Run it again after every `colcon build`.
 
 ## Running the simulation
 
@@ -71,9 +74,9 @@ The simulation grows with you. Start the stage you're at:
 
 | Stage | Command | What's on the table | Lessons |
 |---|---|---|---|
-| 1 | `ros2 launch workshop_arm workshop.launch.py stage:=1` | Nothing: just the arm | Modules 0–9 |
-| 2 | `ros2 launch workshop_arm workshop.launch.py stage:=2` | Bins, and blocks at **known** spots (`KNOWN_BLOCKS` in `table.py`) | Module 10 (Silver) |
-| 3 | `ros2 launch workshop_arm workshop.launch.py stage:=3` | Bins, blocks at **random** spots, an overhead camera and a block detector | Modules 11–12 (Gold) |
+| 1 | `ros2 launch workshop_arm workshop.launch.py stage:=1` | Nothing: just the arm | Lessons 1–13 |
+| 2 | `ros2 launch workshop_arm workshop.launch.py stage:=2` | Bins, and blocks at **known** spots (`KNOWN_BLOCKS` in `table.py`) | Lesson 14 (Silver) |
+| 3 | `ros2 launch workshop_arm workshop.launch.py stage:=3` | Bins, blocks at **random** spots, an overhead camera and a block detector | Lessons 0, 15–16 (Gold) |
 
 Then, in a second terminal:
 
@@ -164,7 +167,6 @@ is running.
 | `lessons/` | **Start here after setup:** one folder per lesson, with exercises and solutions |
 | `docs/instructor_guide.md` | How to run sessions: prep, timing, what to do when things go wrong |
 | `docs/design.md` | Why things are built the way they are, and what was tested |
-| `CLAUDE.md` | Notes for AI assistants (Claude Code) working on this repo |
 | `src/workshop_arm/workshop_arm/arm.py` | The beginner-friendly `Arm` helper |
 | `src/workshop_arm/workshop_arm/table.py` | Table layout: bins, known blocks (stage 2), random block area (stage 3), camera |
 | `src/workshop_arm/workshop_arm/vision.py` | Block detection with OpenCV (no ROS) |
@@ -204,5 +206,10 @@ is running.
   so students on the same Wi-Fi can't see or move each other's robots.
 - Blocks are allowed to collide with everything in MoveIt (the gripper must touch them); bins
   are real obstacles.
-- If your own `~/.bashrc` sources another ROS install (e.g. Humble), start from a clean shell first:
-  `env -i HOME=$HOME PATH=/usr/bin:/bin:$HOME/.pixi/bin DISPLAY=$DISPLAY TERM=$TERM bash --noprofile --norc`
+- If your own `~/.bashrc` sources another ROS install (e.g. Humble), start from a clean shell,
+  and turn on pixi with `shell-hook` instead of `pixi shell` (which would re-read `~/.bashrc`
+  and bring the other ROS back):
+  ```bash
+  env -i HOME=$HOME PATH=/usr/bin:/bin:$HOME/.pixi/bin DISPLAY=$DISPLAY TERM=$TERM bash --noprofile --norc
+  cd so101-arm-workshop && eval "$(pixi shell-hook)" && source install/setup.bash
+  ```

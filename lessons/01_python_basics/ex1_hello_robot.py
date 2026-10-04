@@ -26,3 +26,19 @@ print(f'That is {reach_in_cm} centimeters.')
 # TODO 3: The robot is getting a gripper upgrade and will have 6 joints.
 #         Change number_of_joints (without retyping 5 or 6 by hand!) by adding 1,
 #         then print it again.
+
+# Every value has a TYPE, which decides what you can do with it. The four you'll use most:
+#   int     a whole number               5
+#   float   a number with a decimal      0.48
+#   str     text (a "string")            'SO-101'
+#   bool    True or False                True
+gripper_is_open = True
+print(type(number_of_joints), type(reach_in_meters), type(robot_name), type(gripper_is_open))
+
+# TODO 4: Guess the answer AND its type, then print both to check:
+#             5 / 2          4 / 2          5 * 2
+#         (Hint: print(4 / 2, type(4 / 2)))
+
+# TODO 5: Print '5' + '5', then 5 + 5. Why are the answers different?
+#         Then try print('5' + 5). It stops with an error: read its LAST line.
+#         int('5') turns the text '5' into the number 5. Use it to fix that line.

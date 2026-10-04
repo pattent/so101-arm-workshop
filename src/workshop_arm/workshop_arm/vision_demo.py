@@ -11,6 +11,7 @@ Then:
 """
 
 import rclpy
+from rclpy.duration import Duration
 from rclpy.time import Time
 from visualization_msgs.msg import MarkerArray
 
@@ -37,10 +38,14 @@ class Eyes:
     def look(self):
         """Wait for a fresh camera picture and return [(color, x, y), ...]."""
         asked_at = self.node.get_clock().now()
+        give_up_at = asked_at + Duration(seconds=10)
         while True:
             rclpy.spin_once(self.node, timeout_sec=0.1)
             if self.latest and Time.from_msg(self.latest.markers[0].header.stamp) > asked_at:
                 break
+            if self.node.get_clock().now() > give_up_at:
+                raise RuntimeError('No pictures from the block detector. Did you start the '
+                                   'simulation with stage:=3? (Stages 1 and 2 have no camera.)')
         return [(m.ns, m.pose.position.x, m.pose.position.y)
                 for m in self.latest.markers if m.action == m.ADD]
 

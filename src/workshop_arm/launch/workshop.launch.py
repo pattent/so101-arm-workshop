@@ -1,8 +1,8 @@
 """Start the workshop simulation for the stage you're at.
 
-    ros2 launch workshop_arm workshop.launch.py stage:=1   # just the arm (Modules 0-9)
-    ros2 launch workshop_arm workshop.launch.py stage:=2   # + bins and blocks at known spots (Module 10)
-    ros2 launch workshop_arm workshop.launch.py stage:=3   # + random blocks, live camera, detector (11-12)
+    ros2 launch workshop_arm workshop.launch.py stage:=1   # just the arm (Lessons 1-13)
+    ros2 launch workshop_arm workshop.launch.py stage:=2   # + bins and blocks at known spots (Lesson 14)
+    ros2 launch workshop_arm workshop.launch.py stage:=3   # + random blocks, live camera, detector (15-16)
 
 A window shows the live 3D view of the table (and, in stage 3, what the camera sees).
 

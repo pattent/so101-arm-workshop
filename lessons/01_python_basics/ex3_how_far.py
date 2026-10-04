@@ -1,4 +1,4 @@
-"""Exercise 3: how far is the gripper from the robot?
+"""Exercise 3: how far is the gripper from the robot? Write functions to find out.
 
 The robot measures positions from its base, in meters:
     x = forward, y = to the robot's left.
@@ -28,10 +28,21 @@ distance = 0
 
 print(f'The gripper is {distance:.3f} meters from the base.')
 
-# TODO 2: Python has a shortcut: math.hypot(x, y). Check it gives the same answer.
+# Doing that math by hand for every point would get old fast. That's what functions are for.
 
-# The SO-101 can reach about 0.48 m from its base.
-max_reach = 0.48
+# TODO 2: Write a function distance_from_base(x, y) that RETURNS the distance.
+#         A function can have more than one input: def distance_from_base(x, y):
+#         Test it on the point above, then on (0.30, -0.10). (About 0.269 and 0.316.)
 
-# TODO 3: Is the point (0.40, 0.30) within reach? Calculate its distance and print it.
-#         (Next lesson you'll learn how to make Python decide for you, with "if".)
+# TODO 3: The SO-101 can reach about 0.48 m from its base. Write a function
+#         can_reach(x, y) that returns True if the point is close enough, and False if not.
+#         (Hint: a comparison like  distance_from_base(x, y) < 0.48  IS True or False,
+#         a bool from exercise 1, so you can return it straight away.)
+#         A function can call another function you wrote!
+#         Test it: can_reach(0.25, 0.10) should be True; can_reach(0.40, 0.30) False.
+
+# TODO 4: print shows a value; return gives it back. Write a function
+#         shout_distance(x, y) that PRINTS the distance instead of returning it. Then try:
+#             result = shout_distance(0.25, 0.10)
+#             print('It gave back:', result)
+#         What did it give back? Why?

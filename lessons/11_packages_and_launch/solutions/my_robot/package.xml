@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>my_robot</name>
+  <version>0.0.0</version>
+  <description>My own nodes and launch files for the SO-101 workshop</description>
+  <maintainer email="student@example.com">student</maintainer>
+  <license>MIT</license>
+
+  <!-- Other packages my code uses. -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>workshop_arm</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

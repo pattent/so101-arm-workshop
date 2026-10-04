@@ -6,6 +6,8 @@ Then:
     ros2 run workshop_arm demo
 """
 
+import math
+
 from workshop_arm import Arm
 from workshop_arm.table import BINS
 
@@ -34,8 +36,26 @@ def place(arm, x, y):
     arm.release()
 
 
+def table_is_ready(arm):
+    """True if there's a block at every spot in BLOCKS, and no others.
+
+    In stage 3 the blocks are at random spots, and after a run they're in the bins:
+    either way this program would grab the wrong things (or nothing).
+    """
+    blocks = [obj for obj in arm.get_objects().values() if obj['kind'] == 'block']
+    found = [any(math.dist((obj['x'], obj['y']), (x, y)) < 0.01 for obj in blocks)
+             for x, y, color in BLOCKS]
+    return len(blocks) == len(BLOCKS) and all(found)
+
+
 def main():
     arm = Arm()
+    if not table_is_ready(arm):
+        print('The blocks are not where this demo expects them.\n'
+              'Restart the simulation with stage:=2 (blocks at known spots), then try again.\n'
+              'In stage 3 the blocks are at random spots: use  ros2 run workshop_arm vision_demo')
+        arm.shutdown()
+        return
     arm.go_to('rest')
     arm.open_gripper()
 

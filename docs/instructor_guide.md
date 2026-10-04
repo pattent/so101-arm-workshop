@@ -5,13 +5,17 @@ How to run the sessions. The lessons themselves are in [`lessons/`](../lessons/)
 ## Before the first session
 
 - [ ] Find out her operating system (Windows, Mac with Intel, or Mac with Apple Silicon).
+- [ ] Find out which math she's had. The lessons assume Algebra 1 and Geometry (Pythagoras,
+      coordinates). Lesson 2's circle uses right-triangle trig (SOH-CAH-TOA), which some
+      tenth graders haven't met yet; if so, plan 10 minutes on it before that challenge.
+      Radians, the law of cosines and the camera math are explained in the lessons themselves.
 - [ ] If possible, do the install on her laptop **before** the session, or plan the first hour
       around it: `pixi install` downloads ~6 GB. On a slow connection that alone can take a while.
 - [ ] Have your own machine ready as a backup, with `stage:=3` running, so the session can go on
       even if her install hits a snag.
 - [ ] Skim the lesson's `README.md` and its `solutions/` folder.
 
-**Windows and macOS have not been tested on a real machine yet.** Expect the first install to be
+**Windows has been installed on one laptop so far, and macOS not at all yet.** Expect the first install to be
 where problems show up. Write down any error exactly; it's probably a small fix.
 
 ## Rough timing
@@ -21,10 +25,16 @@ These are guesses. Go at her pace; it's fine to split a lesson or merge two.
 | Lesson | Estimate | Notes |
 |---|---|---|
 | 0 Kickoff | 60–90 min | Mostly the install. The demo and "what do you want to build?" chat take ~20 min. |
-| 1 Python basics | 45–60 min | Exercises 1–3 need no robot; the challenge moves the arm. Read the "functions" and "What is `workshop_arm`?" boxes together before the challenge. |
-| 2 Loops and functions | 60–75 min | First time writing functions (`def`/`return`, no robot), then the wave. The circle (cos/sin) may need a whiteboard sketch. |
-| 3 Decisions and classes | 60–90 min | Reading `arm.py` together is the big one; the Bronze dance can be homework. |
-| 4–12 | ~60–90 min each | Starter files still to be written; estimate after we see how 0–3 go. |
+| 1 Python basics | 75–90 min | Four exercises, none need the robot; the challenge moves the arm. Read the "Functions" box before ex2 and the "Objects" box before ex4. She *writes* small functions (`to_degrees`, `distance_from_base`, `can_reach`) and *extends* a class (`Rover`: a battery attribute and a `recharge` method), but writing whole classes waits for Lesson 5. Everything in the challenge is covered by the four exercises; the bonus (a function that takes `arm`) ties both ideas together. |
+| 2 Lists and loops | 60–75 min | Indexing from 0 is the classic stumble: let her hit the `IndexError` in ex1. The circle challenge explains cos/sin with a right-triangle picture; sketch it on paper together, and work out one point (30°) by hand before running it. |
+| 3 Functions | 60–75 min | Builds on her Lesson 1 functions: default values, returning a tuple (`point_on_circle`, reused in the shapes challenge), functions on lists. Ex3 gives a one-line preview of `if`, which Lesson 4 covers properly. |
+| 4 Decisions and dictionaries | 60–90 min | Ex2 uses the real `BINS` from `table.py`. The Bronze dance can be homework. |
+| 5 Classes | 75–90 min | Reading `arm.py` together (ex3) is the big one: it's long, so stick to the questions. The `DancingArm` challenge reuses her Bronze dance. |
+| 6 Python for robots | 60–75 min | No robot, on purpose. Callbacks (ex1) are the big idea: everything in Lesson 10 depends on it, so don't rush it. The challenge works as homework. |
+| 9 Nodes and topics | 60 min | All command line, three or four terminals at once: arrange the windows before starting. Answers in `solutions/answers.md`. |
+| 10 Writing nodes | 75–90 min | Compare each node with the "shape of every node" box in the README. Nodes run until `Ctrl+C`: say so up front. |
+| 11 Packages and launch files | 75–90 min | The student creates `src/my_robot/` in the workspace. Rebuild-and-source after every change is the usual stumble. |
+| 7–8, 12–16 | ~60–90 min each | Starter files still to be written; estimate after we see how the finished lessons go. |
 
 ## Running a session
 
@@ -53,6 +63,6 @@ More in the main [README troubleshooting table](../README.md#troubleshooting).
 ## After each session
 
 - Note what took longer or shorter than expected, and what she enjoyed. That decides how we
-  write Lessons 4–12.
+  write the remaining lessons.
 - If she wants to change direction (a different project than block sorting), the toolkit
   (`Arm`, stages, camera) still applies; only the later lessons change.

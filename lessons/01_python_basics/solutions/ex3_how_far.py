@@ -9,12 +9,31 @@ y = 0.10
 distance = math.sqrt(x ** 2 + y ** 2)
 print(f'The gripper is {distance:.3f} meters from the base.')
 
-# TODO 2
-print(f'math.hypot says {math.hypot(x, y):.3f} meters.')
 
-max_reach = 0.48
+# TODO 2
+def distance_from_base(x, y):
+    return math.sqrt(x ** 2 + y ** 2)
+
+
+print(distance_from_base(0.25, 0.10))     # about 0.269
+print(distance_from_base(0.30, -0.10))    # about 0.316
+
 
 # TODO 3
-far_distance = math.hypot(0.40, 0.30)
-print(f'(0.40, 0.30) is {far_distance:.3f} m away; the arm reaches {max_reach} m.')
-# 0.5 m is more than 0.48 m, so it's just out of reach.
+def can_reach(x, y):
+    return distance_from_base(x, y) < 0.48
+
+
+print(can_reach(0.25, 0.10))              # True
+print(can_reach(0.40, 0.30))              # False: it's 0.5 m away
+
+
+# TODO 4
+def shout_distance(x, y):
+    print('The distance is', distance_from_base(x, y))
+
+
+result = shout_distance(0.25, 0.10)
+print('It gave back:', result)
+# It gave back None ("nothing"): the function printed the distance, but had no `return`,
+# so there was no answer to save in result.
