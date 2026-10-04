@@ -71,6 +71,16 @@ def main():
     rviz_file = REPO_DIR / 'so101_moveit_config' / 'config' / 'moveit.rviz'
     rviz_file.write_text(rviz_file.read_text().replace('Loop Animation: true', 'Loop Animation: false'))
 
+    # Windows fix: the xacro command wraps camera poses in single quotes, which only
+    # Linux/macOS treat as grouping. Double quotes work on every platform.
+    for launch_name in ['follower.launch.py', 'follower_split.launch.py']:
+        launch_file = REPO_DIR / 'so101_bringup' / 'launch' / launch_name
+        text = launch_file.read_text()
+        text = (text.replace(":='\"", ':=\\""')
+                    .replace("\"' cam_", '"\\" cam_')
+                    .replace('"\'",', '"\\"",'))
+        launch_file.write_text(text)
+
     print('Setup done. Next: colcon build')
 
 
