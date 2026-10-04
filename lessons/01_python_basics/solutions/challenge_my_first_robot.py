@@ -1,8 +1,9 @@
 """Solution: Challenge (one possible answer)."""
 
+# workshop_arm is our own package (in src/workshop_arm/). Arm is the robot arm.
 from workshop_arm import Arm
 
-arm = Arm()
+arm = Arm()     # connect to the robot (the simulation must be running)
 
 print('Going to the rest pose...')
 arm.go_to('rest')

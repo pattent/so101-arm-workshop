@@ -18,8 +18,8 @@ understand the whole thing, from camera pixels to motor commands.
 | # | Lesson | You'll learn | Simulation | Status |
 |---|---|---|---|---|
 | 0 | [Kickoff](00_kickoff/) | Where we're going; install everything | stage 3 | ✅ ready |
-| 1 | [Python basics](01_python_basics/) | Variables, `print`, math; first robot moves | stage 1 | ✅ ready |
-| 2 | [Loops and functions](02_loops_and_functions/) | Lists, `for`, `def`; draw shapes in the air | stage 1 | ✅ ready |
+| 1 | [Python basics](01_python_basics/) | Variables, `print`, math, *using* functions; first robot moves | stage 1 | ✅ ready |
+| 2 | [Loops and functions](02_loops_and_functions/) | Lists, `for` loops, *writing* functions (`def`, `return`); draw shapes in the air | stage 1 | ✅ ready |
 | 3 | [Decisions and classes](03_decisions_and_classes/) | `if`, dictionaries, classes. 🥉 **Bronze** | stage 1 | ✅ ready |
 | 4 | [Forward kinematics](04_forward_kinematics/) | Coordinates; joint angles → gripper position | stage 1 | outline |
 | 5 | [Inverse kinematics](05_inverse_kinematics/) | Gripper position → joint angles | stage 1 | outline |

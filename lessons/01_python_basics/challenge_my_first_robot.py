@@ -18,9 +18,10 @@ If a pose is impossible (out of reach, or the arm would hit itself or the table)
 the arm stays put and prints a message. That's fine: try different numbers!
 """
 
+# workshop_arm is our own package (in src/workshop_arm/). Arm is the robot arm.
 from workshop_arm import Arm
 
-arm = Arm()
+arm = Arm()     # connect to the robot (the simulation must be running)
 
 print('Going to the rest pose...')
 arm.go_to('rest')

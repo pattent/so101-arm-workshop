@@ -17,7 +17,8 @@ print(f'{quarter_turn_degrees} degrees is {quarter_turn_radians} radians')
 
 # TODO 1: Convert 45 degrees to radians the same way, and print it.
 
-# TODO 2: Python can do it for you: math.radians(degrees).
+# TODO 2: Python has a function that does it for you: math.radians(degrees).
+#         You "call" it with the angle in the parentheses, and it gives back the answer.
 #         Use it to convert 45 degrees, and check you get the same answer.
 
 # TODO 3: Go the other way. The robot reports its elbow is at 1.2 radians.

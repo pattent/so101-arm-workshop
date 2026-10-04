@@ -1,8 +1,8 @@
-"""Exercise 2: functions.
+"""Exercise 3: functions that move the robot.
 
 A function gives a name to a few steps, so you can reuse them.
 
-Run (with the stage 1 simulation running):  python ex2_wave.py
+Run (with the stage 1 simulation running):  python ex3_wave.py
 """
 
 from workshop_arm import Arm

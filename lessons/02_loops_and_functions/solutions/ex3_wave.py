@@ -1,4 +1,4 @@
-"""Solution: Exercise 2."""
+"""Solution: Exercise 3."""
 
 from workshop_arm import Arm
 

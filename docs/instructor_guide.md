@@ -21,8 +21,8 @@ These are guesses. Go at her pace; it's fine to split a lesson or merge two.
 | Lesson | Estimate | Notes |
 |---|---|---|
 | 0 Kickoff | 60–90 min | Mostly the install. The demo and "what do you want to build?" chat take ~20 min. |
-| 1 Python basics | 45–60 min | Exercises 1–3 need no robot; the challenge moves the arm. |
-| 2 Loops and functions | 60 min | The circle (cos/sin) may need a whiteboard sketch. |
+| 1 Python basics | 45–60 min | Exercises 1–3 need no robot; the challenge moves the arm. Read the "functions" and "What is `workshop_arm`?" boxes together before the challenge. |
+| 2 Loops and functions | 60–75 min | First time writing functions (`def`/`return`, no robot), then the wave. The circle (cos/sin) may need a whiteboard sketch. |
 | 3 Decisions and classes | 60–90 min | Reading `arm.py` together is the big one; the Bronze dance can be homework. |
 | 4–12 | ~60–90 min each | Starter files still to be written; estimate after we see how 0–3 go. |
 
