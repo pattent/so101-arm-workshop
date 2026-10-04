@@ -12,6 +12,13 @@ Why the workshop is built the way it is, and what was checked. Newest decisions 
 - `pixi.lock` is solved for all four platforms, which proves every package exists everywhere.
   **Not yet tried on a real Windows or Mac machine.**
 
+## ROS networking: this computer only
+
+`pixi.toml` sets `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST`. By default ROS 2 discovers nodes on
+the whole local network: on school Wi-Fi, students' simulations could see and command each
+other's arms. Found during the Lesson 1 dry run, where a network change also broke discovery
+for an already-running simulation.
+
 ## Robot stack: esol-community `so101-ros-physical-ai`
 
 Compared four community SO-101 ROS 2 stacks. Chose
@@ -77,4 +84,5 @@ camera + detector. Lets lessons start simple and add perception later.
 | `block_detector` at ~500% CPU | `cv2.setNumThreads(1)` | ~20% |
 | `rqt_image_view` ~150% CPU per window, laggy | `sim_view` shows its own OpenCV window | one light window |
 | Renders ~45 ms each | 1024 shadow map in the 3D view, no shadows in the camera, cheaper noise | camera 15 Hz, joint states ~100 Hz |
+| Beginner output cluttered with ROS log prefixes | `Arm` prints plain `[arm] ...` messages | reads like one conversation with her own `print`s |
 | RViz looks choppier | Not a bug: RViz's robot updates ~18 Hz (TF) / ~8 Hz (planning scene) | the simulation window is the place to *watch* |

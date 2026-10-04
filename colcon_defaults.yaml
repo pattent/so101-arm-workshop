@@ -1,4 +1,6 @@
 # Used automatically by `colcon build` inside `pixi shell`.
 build:
   merge-install: true      # shorter paths (needed on Windows)
-  cmake-args: ["-G", "Ninja", "-DBUILD_TESTING=OFF"]   # Ninja: no Visual Studio needed
+  # Ninja: no Visual Studio needed. -Wno-deprecated hides harmless warnings from the
+  # SO-101 packages.
+  cmake-args: ["-G", "Ninja", "-DBUILD_TESTING=OFF", "-Wno-deprecated"]

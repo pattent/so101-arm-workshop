@@ -32,6 +32,11 @@ opencv = "*"
 matplotlib = "*"
 mujoco = "*"          # renders the simulated camera view
 
+# Keep ROS 2 on this computer only: robots on the same (school) Wi-Fi can't see or control
+# each other, and Wi-Fi changes can't break a running simulation.
+[activation.env]
+ROS_AUTOMATIC_DISCOVERY_RANGE = "LOCALHOST"
+
 # Default colcon options, so students can type a plain `colcon build`.
 [target.unix.activation.env]
 COLCON_DEFAULTS_FILE = "$PIXI_PROJECT_ROOT/colcon_defaults.yaml"

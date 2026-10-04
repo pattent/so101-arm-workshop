@@ -74,6 +74,10 @@ don't collide with anything the user has running.
 - Unreachable `move_to` targets are rejected instantly by a distance check in `Arm.move_to`
   (MoveIt otherwise burns its full planning time before failing).
 - Positive `shoulder_pan` turns the arm to its *right* (−y).
+- ROS discovery is localhost-only (`pixi.toml`); test processes must also run inside the pixi
+  environment or they won't see the simulation.
+- A clean `colcon build` still reports "1 package had stderr output: so101_description" (an
+  unfixable CMake warning from building without a compiler). The README tells students it's fine.
 
 ## Git
 

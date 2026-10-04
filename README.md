@@ -50,6 +50,10 @@ python scripts/setup_workspace.py   # downloads the SO-101 robot packages
 colcon build                        # builds the workspace
 ```
 
+It worked if the build ends with `Summary: 4 packages finished`. A line like
+`1 package had stderr output: so101_description` is just a harmless warning; a real problem
+says `Failed`.
+
 ## Every new terminal
 
 ```bash
@@ -182,6 +186,7 @@ is running.
 | `No block there` / `Missed!` | Is the right stage running? `demo` needs `stage:=2`, `vision_demo` needs `stage:=3`. |
 | Everything is slow | Close other apps, or add `rviz:=false`. |
 | Leftover windows or nodes from an earlier run | Close all terminals, then run `ros2 daemon stop` in a fresh one. |
+| `MoveIt is not running` even though the simulation is open | Both terminals must be in `pixi shell` (it keeps ROS on this computer only). Restart the simulation if you switched Wi-Fi networks. |
 | Windows: errors about long paths | Move the folder to a short path like `C:\so101`. |
 
 ## Notes for instructors
@@ -195,6 +200,8 @@ is running.
   Gazebo. Blocks attach to the gripper by rule: `grab()` only succeeds if a block is within 2 cm,
   so bad perception shows up as a miss. On real hardware, `sim_view`'s camera is replaced by a
   webcam driver.
+- `pixi.toml` sets `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST`: ROS only talks within this computer,
+  so students on the same Wi-Fi can't see or move each other's robots.
 - Blocks are allowed to collide with everything in MoveIt (the gripper must touch them); bins
   are real obstacles.
 - If your own `~/.bashrc` sources another ROS install (e.g. Humble), start from a clean shell first:

@@ -391,4 +391,5 @@ class Arm:
         return future.result()
 
     def _log(self, text):
-        self.node.get_logger().info(text)
+        # Plain messages (no ROS timestamps) so they're easy to read next to your own prints.
+        print(f'  [arm] {text}', flush=True)
