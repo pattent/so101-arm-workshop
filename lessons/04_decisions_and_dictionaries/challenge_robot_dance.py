@@ -9,7 +9,10 @@ Ideas:
 - Change arm.speed for slow and fast parts.
 - Open and close the gripper like it's clapping: arm.open_gripper(), arm.close_gripper().
 - If a move fails (returns False), skip to the next one instead of stopping.
-- Bonus: time it! `import time`, then `start = time.time()` ... `time.time() - start`.
+- Bonus: make it exactly long enough. `import time`, and `start = time.time()` before the
+  dance; then `time.time() - start` is how many seconds have passed. Use a `while` loop to
+  keep repeating your choreography until 30 seconds are up:
+      while time.time() - start < 30:
 """
 
 from workshop_arm import Arm

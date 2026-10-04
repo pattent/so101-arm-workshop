@@ -33,11 +33,27 @@ arm.move_joints(0, -45, 45, 45, 0)     # a method with five inputs, in order (se
 print('The gripper is now at', arm.where_am_i())
 
 # TODO 1: Make the arm turn to its LEFT. (Which joint? Positive or negative?)
+#         Store the angle in a variable first, e.g.  pan = ...  and use it in move_joints.
+#         Then print where the gripper went with an f-string, like
+#             print(f'Turned to {pan} degrees, gripper at {arm.where_am_i()}')
 
 # TODO 2: Make the arm point straight up. (Hint: try shoulder_lift = -90 with the
 #         elbow and wrist straight.)
 
-# TODO 3: Invent your own pose. Print where the gripper ended up.
+# TODO 3: arm.speed is an ATTRIBUTE (like curiosity.battery in exercise 4): a number from
+#         0.1 (slow) to 1.0 (full speed). Set it to 0.2 and go back to 'rest', then set it
+#         to 1.0 and point straight up again. Can you see the difference?
+
+# TODO 4: arm.move_to(x, y, z) moves the gripper to a point, in meters, and RETURNS an
+#         answer: did it work? Save it in a variable:
+#             ok = arm.move_to(0.25, 0.0, 0.10)
+#         Print ok, and print type(ok). What type is it?
+#         Then try a point that's too far away, like (0.60, 0.0, 0.10). What comes back?
+#         Now copy your can_reach AND distance_from_base functions from exercise 3 to the
+#         top of this file (can_reach needs distance_from_base, which needs `import math`),
+#         and print can_reach(0.60, 0.0). Does your function agree with the robot?
+
+# TODO 5: Invent your own pose. Print where the gripper ended up, with an f-string.
 
 # Bonus: write a function show_pose(arm, pan) that moves the arm to
 #        (pan, -45, 45, 45, 0) and prints where the gripper is. A function's input can be

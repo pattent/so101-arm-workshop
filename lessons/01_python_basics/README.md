@@ -104,8 +104,9 @@ Start the simulation first, in another terminal:
 ```bash
 ros2 launch workshop_arm workshop.launch.py stage:=1
 ```
-Then make the arm visit three different poses of your choice. Bonus: write a function that
-takes the robot as an input.
+Then use everything from today on the real arm: poses stored in variables, its `speed`
+attribute, and the `True`/`False` answer from `move_to`, checked against your own `can_reach`
+function. Bonus: write a function that takes the robot as an input.
 
 ## Things to remember
 

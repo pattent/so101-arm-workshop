@@ -48,7 +48,8 @@ A **dictionary** when you look things up by name (bins by color, poses by name).
 ## Challenge (on your own): 🥉 Bronze
 
 **[`challenge_robot_dance.py`](challenge_robot_dance.py): a 30-second robot dance.**
-Use everything so far: variables, lists, loops, functions, `if` and dictionaries.
+Use everything so far: variables, lists, loops, functions, `if` and dictionaries. Bonus: a
+`while` loop that keeps the dance going until exactly 30 seconds are up.
 Show it off at the end of the session!
 
 ## Things to remember
