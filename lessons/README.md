@@ -71,6 +71,8 @@ Gold: camera → block positions → arm sorts them
 
 ## Notes for instructors
 
+See the [instructor guide](../docs/instructor_guide.md) for session prep and timing.
+
 - [ ] Dry-run the install on a real Windows laptop and a real Mac (only tested on Linux so far).
 - [ ] Starter files and solutions for Lessons 4–12.
 - Run a lesson's exercises from inside its folder, in a terminal with `pixi shell` and

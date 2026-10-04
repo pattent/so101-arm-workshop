@@ -158,6 +158,9 @@ is running.
 | `colcon_defaults.yaml` | Default `colcon build` options (used automatically inside `pixi shell`) |
 | `scripts/setup_workspace.py` | Downloads the SO-101 packages and adapts them for the workshop |
 | `lessons/` | **Start here after setup:** one folder per lesson, with exercises and solutions |
+| `docs/instructor_guide.md` | How to run sessions: prep, timing, what to do when things go wrong |
+| `docs/design.md` | Why things are built the way they are, and what was tested |
+| `CLAUDE.md` | Notes for AI assistants (Claude Code) working on this repo |
 | `src/workshop_arm/workshop_arm/arm.py` | The beginner-friendly `Arm` helper |
 | `src/workshop_arm/workshop_arm/table.py` | Table layout: bins, known blocks (stage 2), random block area (stage 3), camera |
 | `src/workshop_arm/workshop_arm/vision.py` | Block detection with OpenCV (no ROS) |
