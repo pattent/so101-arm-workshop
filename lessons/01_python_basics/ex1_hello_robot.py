@@ -4,9 +4,9 @@ Run:  python ex1_hello_robot.py
 """
 
 # A variable is a name for a value. Here are some facts about our robot.
-robot_name = 'SO-101'
-number_of_joints = 5
-reach_in_meters = 0.48
+robot_name = 'SO-101'  # this is called a string when it is text 
+number_of_joints = 5  # this is called an integer, a whole number with no decimal
+reach_in_meters = 0.48  # this is called a float, a decimal number
 
 print('Hello! My name is', robot_name)
 print('I have', number_of_joints, 'joints, plus a gripper.')
@@ -32,7 +32,7 @@ print(f'That is {reach_in_cm} centimeters.')
 #   float   a number with a decimal      0.48
 #   str     text (a "string")            'SO-101'
 #   bool    True or False                True
-gripper_is_open = True
+gripper_is_open = True  # this type of variable is called a bool, bools are either True or False
 print(type(number_of_joints), type(reach_in_meters), type(robot_name), type(gripper_is_open))
 
 # TODO 4: Guess the answer AND its type, then print both to check:
